@@ -1,0 +1,27 @@
+# Virtual Environment
+/.venv/
+venv/
+env/
+
+# IDE
+/.idea/
+.vscode/
+
+# Python cache & artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.coverage
+htmlcov/
+dist/
+build/
+*.egg-info/
+
+# Environment variables
+.env
+.env.local
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/

@@ -73,13 +73,12 @@ Każdy wiersz w `data/raw/metadata.jsonl`:
 ---
 
 ### Strumień A (Agent 1): Pobieranie i Próbkowanie Danych (`src/scrapper`)
-*Może wystartować od razu po Strumieniu 0.*
-- **Zadanie A1**: Analiza struktury kategorii Erli (kategorie główne: Dom i ogród, Dziecko, Elektronika, Firma i usługi, Moda, Motoryzacja, Sport i turystyka, Supermarket, Uroda, Zdrowie).
-- **Zadanie A2**: Implementacja klienta pobierającego (API wewnętrzne / scraper z zachowaniem rate-limitów, retry, timeoutów).
-- **Zadanie A3**: Strategia próbkowania:
-  - Reprezentatywność: zbalansowana liczba produktów na kategorię główną (np. po 50–100 produktów na kategorię dla prototypu, zróżnicowane podkategorie).
-  - Uzasadnienie metodologiczne wielkości próby (czas pobierania vs moc statystyczna dla ewaluacji klasyfikatora).
-- **Zadanie A4**: Zapis zdjęć do `data/raw/<kategoria_glowna>/<podkategoria_stopien_1>/` oraz metadanych do `metadata.jsonl` (lub `.parquet`/`.csv`).
+- [x] **Zadanie A1**: Analiza struktury kategorii Erli (kategorie główne: 12 kategorii, mapowanie drzewa w `src/scrapper/category_tree.py` i `data/category_tree.json`).
+- [x] **Zadanie A2**: Implementacja klienta pobierającego (`src/scrapper/erli_client.py` z obsługą sesji, rate-limitów, konwersji zdjęć i natywnego TLS).
+- [x] **Zadanie A3**: Strategia próbkowania:
+  - Zbalansowana liczba produktów per kategoria główna (obecnie cel 35 produktów x 12 = 420 produktów z podziałem na podkategorie 1. stopnia).
+  - Skalowalność do setek/tysięcy przez parametr `--target-per-category`.
+- [x] **Zadanie A4**: Zapis zdjęć do `data/raw/<kategoria_glowna>/<podkategoria_stopien_1>/` oraz metadanych do `data/raw/metadata.jsonl` ze wsparciem dla multi-label (`additional_categories`).
 
 ---
 
@@ -91,10 +90,14 @@ Każdy wiersz w `data/raw/metadata.jsonl`:
   - *Opcja B (Baseline)*: Lekki transfer learning (np. fine-tuning warstwy liniowej na embeddingach SigLIP / ResNet50 / MobileNetV3).
 - **Zadanie B3**: Pipeline inferencji jedno- i wielo-obrazowej (`predict_category(image) -> CategoryPrediction`).
 - **Zadanie B4**: Zapis predykcji wraz z poziomem pewności (confidence/probabilities) do dalszej ewaluacji.
+- **Zadanie B5 (Multi-label Ready)**: Przygotowanie pipeline'u na przypadek multi-label:
+  - Progowanie sigmoidalne (thresholding na poziomie np. >= 0.35 dla wielu kategorii równocześnie).
+  - Wykrywanie nakładających się kategorii (np. Moda + Sport, Dziecko + Zabawki/Elektronika) i zapis listy `predicted_categories`.
 
 ---
 
 ### Strumień C (Agent 3): Detekcja Elementów Ubioru (`src/detection`)
+*Zgodnie z ustaleniami: realizowany na samym końcu, po pełnym wdrożeniu i opisaniu Strumieni A i B.*
 *Może pracować całkowicie niezależnie od klasyfikatora.*
 - **Zadanie C1**: Wybór pretrenowanego modelu detekcji modowej:
   - Np. YOLOv8/YOLO11 z wagami COCO (klasy: person, tie, handbag, suitcase, backpack) lub wyspecjalizowany model zorientowany na modę (np. Fashionpedia / DeepFashion2 weights lub OWL-ViT / Grounding DINO dla detekcji otwartej typu `dress`, `jacket`, `pants`, `shoes`, `shirt`).

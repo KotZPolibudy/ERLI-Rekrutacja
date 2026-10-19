@@ -25,3 +25,6 @@ build/
 
 # Jupyter Notebook checkpoints
 .ipynb_checkpoints/
+
+# data
+/data

@@ -16,6 +16,10 @@ class ProductMetadata(BaseModel):
     category_main: str = Field(description="Kategoria główna (poziom 0)")
     category_sub1: Optional[str] = Field(default=None, description="Podkategoria 1. stopnia")
     category_path: List[str] = Field(default_factory=list, description="Pełna ścieżka w drzewie kategorii")
+    additional_categories: List[str] = Field(
+        default_factory=list,
+        description="Dodatkowe kategorie (dla scenariuszy multi-label, np. Moda + Sport)"
+    )
     image_url: str = Field(description="Oryginalny URL zdjęcia produktu")
     local_image_path: str = Field(description="Względna ścieżka do zapisanego pliku graficznego")
     price: Optional[float] = Field(default=None, description="Cena produktu")
@@ -37,7 +41,10 @@ class CategoryPrediction(BaseModel):
     product_id: str
     image_path: str
     true_category: Optional[str] = None
+    true_categories: List[str] = Field(default_factory=list, description="Rzeczywiste kategorie w scenariuszu multi-label")
     predicted_category: str
+    predicted_categories: List[str] = Field(default_factory=list, description="Przewidziane kategorie dla multi-label")
+    is_multilabel: bool = Field(default=False, description="Czy wynik dotyczy ewaluacji multi-label")
     confidence: float
     top_k_predictions: List[CategoryScore] = Field(
         default_factory=list,

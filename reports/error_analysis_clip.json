@@ -1,0 +1,674 @@
+{
+  "total_errors": 131,
+  "total_multilabel": 93,
+  "sample_errors": [
+    {
+      "product_id": "151408512",
+      "image_path": "C:\\Users\\User\\PycharmProjects\\ERLI-Rekrut\\data\\raw\\Dom i Ogród\\Meble do Twojego wnętrza\\151408512.jpg",
+      "true_category": "Dom i Ogród",
+      "predicted_category": "Elektronika",
+      "confidence": 0.3847,
+      "predicted_categories": [
+        "Elektronika",
+        "Firma"
+      ],
+      "top3": [
+        [
+          "Elektronika",
+          0.3847
+        ],
+        [
+          "Firma",
+          0.2036
+        ],
+        [
+          "Dom i Ogród",
+          0.1614
+        ]
+      ]
+    },
+    {
+      "product_id": "159029895",
+      "image_path": "C:\\Users\\User\\PycharmProjects\\ERLI-Rekrut\\data\\raw\\Dom i Ogród\\Wyposażenie\\159029895.jpg",
+      "true_category": "Dom i Ogród",
+      "predicted_category": "Uroda",
+      "confidence": 0.5923,
+      "predicted_categories": [
+        "Uroda",
+        "Moda"
+      ],
+      "top3": [
+        [
+          "Uroda",
+          0.5923
+        ],
+        [
+          "Moda",
+          0.2578
+        ],
+        [
+          "Dom i Ogród",
+          0.0528
+        ]
+      ]
+    },
+    {
+      "product_id": "356854732",
+      "image_path": "C:\\Users\\User\\PycharmProjects\\ERLI-Rekrut\\data\\raw\\Dom i Ogród\\Włókniny ogrodowe\\356854732.jpg",
+      "true_category": "Dom i Ogród",
+      "predicted_category": "Sport i turystyka",
+      "confidence": 0.4945,
+      "predicted_categories": [
+        "Sport i turystyka"
+      ],
+      "top3": [
+        [
+          "Sport i turystyka",
+          0.4945
+        ],
+        [
+          "Motoryzacja",
+          0.1039
+        ],
+        [
+          "Dziecko",
+          0.1013
+        ]
+      ]
+    },
+    {
+      "product_id": "350204494",
+      "image_path": "C:\\Users\\User\\PycharmProjects\\ERLI-Rekrut\\data\\raw\\Dom i Ogród\\Ogród - Literatura\\350204494.jpg",
+      "true_category": "Dom i Ogród",
+      "predicted_category": "Motoryzacja",
+      "confidence": 0.4946,
+      "predicted_categories": [
+        "Motoryzacja"
+      ],
+      "top3": [
+        [
+          "Motoryzacja",
+          0.4946
+        ],
+        [
+          "Dom i Ogród",
+          0.1491
+        ],
+        [
+          "Sport i turystyka",
+          0.1341
+        ]
+      ]
+    },
+    {
+      "product_id": "321895621",
+      "image_path": "C:\\Users\\User\\PycharmProjects\\ERLI-Rekrut\\data\\raw\\Dom i Ogród\\Grille i urządzenia ogrodowe\\321895621.jpg",
+      "true_category": "Dom i Ogród",
+      "predicted_category": "Firma",
+      "confidence": 0.3899,
+      "predicted_categories": [
+        "Firma",
+        "Supermarket"
+      ],
+      "top3": [
+        [
+          "Firma",
+          0.3899
+        ],
+        [
+          "Supermarket",
+          0.2303
+        ],
+        [
+          "Dziecko",
+          0.1966
+        ]
+      ]
+    },
+    {
+      "product_id": "142058773",
+      "image_path": "C:\\Users\\User\\PycharmProjects\\ERLI-Rekrut\\data\\raw\\Dom i Ogród\\Oświetlenie\\142058773.jpg",
+      "true_category": "Dom i Ogród",
+      "predicted_category": "Motoryzacja",
+      "confidence": 0.7137,
+      "predicted_categories": [
+        "Motoryzacja"
+      ],
+      "top3": [
+        [
+          "Motoryzacja",
+          0.7137
+        ],
+        [
+          "Sport i turystyka",
+          0.0955
+        ],
+        [
+          "Dom i Ogród",
+          0.0913
+        ]
+      ]
+    },
+    {
+      "product_id": "315914479",
+      "image_path": "C:\\Users\\User\\PycharmProjects\\ERLI-Rekrut\\data\\raw\\Dom i Ogród\\Narzędzia\\315914479.jpg",
+      "true_category": "Dom i Ogród",
+      "predicted_category": "Firma",
+      "confidence": 0.4305,
+      "predicted_categories": [
+        "Firma",
+        "Motoryzacja"
+      ],
+      "top3": [
+        [
+          "Firma",
+          0.4305
+        ],
+        [
+          "Motoryzacja",
+          0.2443
+        ],
+        [
+          "Zdrowie",
+          0.1768
+        ]
+      ]
+    },
+    {
+      "product_id": "301378492",
+      "image_path": "C:\\Users\\User\\PycharmProjects\\ERLI-Rekrut\\data\\raw\\Dom i Ogród\\Przybory kuchenne\\301378492.jpg",
+      "true_category": "Dom i Ogród",
+      "predicted_category": "Dziecko",
+      "confidence": 0.421,
+      "predicted_categories": [
+        "Dziecko",
+        "Zdrowie"
+      ],
+      "top3": [
+        [
+          "Dziecko",
+          0.421
+        ],
+        [
+          "Zdrowie",
+          0.237
+        ],
+        [
+          "Firma",
+          0.1585
+        ]
+      ]
+    },
+    {
+      "product_id": "354821900",
+      "image_path": "C:\\Users\\User\\PycharmProjects\\ERLI-Rekrut\\data\\raw\\Dom i Ogród\\Wyposażenie\\354821900.jpg",
+      "true_category": "Dom i Ogród",
+      "predicted_category": "Uroda",
+      "confidence": 0.2531,
+      "predicted_categories": [
+        "Uroda",
+        "Moda",
+        "Zdrowie"
+      ],
+      "top3": [
+        [
+          "Uroda",
+          0.2531
+        ],
+        [
+          "Moda",
+          0.2408
+        ],
+        [
+          "Zdrowie",
+          0.2091
+        ]
+      ]
+    },
+    {
+      "product_id": "235628361",
+      "image_path": "C:\\Users\\User\\PycharmProjects\\ERLI-Rekrut\\data\\raw\\Dom i Ogród\\Oczko wodne do ogrodu\\235628361.jpg",
+      "true_category": "Dom i Ogród",
+      "predicted_category": "Motoryzacja",
+      "confidence": 0.3284,
+      "predicted_categories": [
+        "Motoryzacja",
+        "Supermarket"
+      ],
+      "top3": [
+        [
+          "Motoryzacja",
+          0.3284
+        ],
+        [
+          "Supermarket",
+          0.318
+        ],
+        [
+          "Firma",
+          0.1898
+        ]
+      ]
+    },
+    {
+      "product_id": "151092698",
+      "image_path": "C:\\Users\\User\\PycharmProjects\\ERLI-Rekrut\\data\\raw\\Dom i Ogród\\Wyposażenie\\151092698.jpg",
+      "true_category": "Dom i Ogród",
+      "predicted_category": "Supermarket",
+      "confidence": 0.2909,
+      "predicted_categories": [
+        "Supermarket",
+        "Zdrowie"
+      ],
+      "top3": [
+        [
+          "Supermarket",
+          0.2909
+        ],
+        [
+          "Zdrowie",
+          0.2464
+        ],
+        [
+          "Firma",
+          0.1737
+        ]
+      ]
+    },
+    {
+      "product_id": "279901548",
+      "image_path": "C:\\Users\\User\\PycharmProjects\\ERLI-Rekrut\\data\\raw\\Dom i Ogród\\Doniczki i pojemniki ogrodowe\\279901548.jpg",
+      "true_category": "Dom i Ogród",
+      "predicted_category": "Motoryzacja",
+      "confidence": 0.5981,
+      "predicted_categories": [
+        "Motoryzacja"
+      ],
+      "top3": [
+        [
+          "Motoryzacja",
+          0.5981
+        ],
+        [
+          "Firma",
+          0.1708
+        ],
+        [
+          "Dom i Ogród",
+          0.0733
+        ]
+      ]
+    },
+    {
+      "product_id": "350250889",
+      "image_path": "C:\\Users\\User\\PycharmProjects\\ERLI-Rekrut\\data\\raw\\Dom i Ogród\\Ogród - Literatura\\350250889.jpg",
+      "true_category": "Dom i Ogród",
+      "predicted_category": "Moda",
+      "confidence": 0.7653,
+      "predicted_categories": [
+        "Moda"
+      ],
+      "top3": [
+        [
+          "Moda",
+          0.7653
+        ],
+        [
+          "Sport i turystyka",
+          0.148
+        ],
+        [
+          "Zdrowie",
+          0.0241
+        ]
+      ]
+    },
+    {
+      "product_id": "153694497",
+      "image_path": "C:\\Users\\User\\PycharmProjects\\ERLI-Rekrut\\data\\raw\\Dom i Ogród\\Nawozy i preparaty do ogrodu\\153694497.jpg",
+      "true_category": "Dom i Ogród",
+      "predicted_category": "Supermarket",
+      "confidence": 0.4934,
+      "predicted_categories": [
+        "Supermarket",
+        "Zdrowie"
+      ],
+      "top3": [
+        [
+          "Supermarket",
+          0.4934
+        ],
+        [
+          "Zdrowie",
+          0.3607
+        ],
+        [
+          "Dom i Ogród",
+          0.0603
+        ]
+      ]
+    },
+    {
+      "product_id": "278623088",
+      "image_path": "C:\\Users\\User\\PycharmProjects\\ERLI-Rekrut\\data\\raw\\Dom i Ogród\\Oczko wodne do ogrodu\\278623088.jpg",
+      "true_category": "Dom i Ogród",
+      "predicted_category": "Firma",
+      "confidence": 0.2459,
+      "predicted_categories": [
+        "Firma",
+        "Motoryzacja"
+      ],
+      "top3": [
+        [
+          "Firma",
+          0.2459
+        ],
+        [
+          "Motoryzacja",
+          0.2386
+        ],
+        [
+          "Sport i turystyka",
+          0.1729
+        ]
+      ]
+    }
+  ],
+  "sample_multilabel": [
+    {
+      "product_id": "151408512",
+      "image_path": "C:\\Users\\User\\PycharmProjects\\ERLI-Rekrut\\data\\raw\\Dom i Ogród\\Meble do Twojego wnętrza\\151408512.jpg",
+      "true_category": "Dom i Ogród",
+      "predicted_categories": [
+        "Elektronika",
+        "Firma"
+      ],
+      "top_scores": [
+        [
+          "Elektronika",
+          0.3847
+        ],
+        [
+          "Firma",
+          0.2036
+        ]
+      ]
+    },
+    {
+      "product_id": "159029895",
+      "image_path": "C:\\Users\\User\\PycharmProjects\\ERLI-Rekrut\\data\\raw\\Dom i Ogród\\Wyposażenie\\159029895.jpg",
+      "true_category": "Dom i Ogród",
+      "predicted_categories": [
+        "Uroda",
+        "Moda"
+      ],
+      "top_scores": [
+        [
+          "Uroda",
+          0.5923
+        ],
+        [
+          "Moda",
+          0.2578
+        ]
+      ]
+    },
+    {
+      "product_id": "321895621",
+      "image_path": "C:\\Users\\User\\PycharmProjects\\ERLI-Rekrut\\data\\raw\\Dom i Ogród\\Grille i urządzenia ogrodowe\\321895621.jpg",
+      "true_category": "Dom i Ogród",
+      "predicted_categories": [
+        "Firma",
+        "Supermarket"
+      ],
+      "top_scores": [
+        [
+          "Firma",
+          0.3899
+        ],
+        [
+          "Supermarket",
+          0.2303
+        ]
+      ]
+    },
+    {
+      "product_id": "315914479",
+      "image_path": "C:\\Users\\User\\PycharmProjects\\ERLI-Rekrut\\data\\raw\\Dom i Ogród\\Narzędzia\\315914479.jpg",
+      "true_category": "Dom i Ogród",
+      "predicted_categories": [
+        "Firma",
+        "Motoryzacja"
+      ],
+      "top_scores": [
+        [
+          "Firma",
+          0.4305
+        ],
+        [
+          "Motoryzacja",
+          0.2443
+        ]
+      ]
+    },
+    {
+      "product_id": "301378492",
+      "image_path": "C:\\Users\\User\\PycharmProjects\\ERLI-Rekrut\\data\\raw\\Dom i Ogród\\Przybory kuchenne\\301378492.jpg",
+      "true_category": "Dom i Ogród",
+      "predicted_categories": [
+        "Dziecko",
+        "Zdrowie"
+      ],
+      "top_scores": [
+        [
+          "Dziecko",
+          0.421
+        ],
+        [
+          "Zdrowie",
+          0.237
+        ]
+      ]
+    },
+    {
+      "product_id": "354821900",
+      "image_path": "C:\\Users\\User\\PycharmProjects\\ERLI-Rekrut\\data\\raw\\Dom i Ogród\\Wyposażenie\\354821900.jpg",
+      "true_category": "Dom i Ogród",
+      "predicted_categories": [
+        "Uroda",
+        "Moda",
+        "Zdrowie"
+      ],
+      "top_scores": [
+        [
+          "Uroda",
+          0.2531
+        ],
+        [
+          "Moda",
+          0.2408
+        ],
+        [
+          "Zdrowie",
+          0.2091
+        ]
+      ]
+    },
+    {
+      "product_id": "235628361",
+      "image_path": "C:\\Users\\User\\PycharmProjects\\ERLI-Rekrut\\data\\raw\\Dom i Ogród\\Oczko wodne do ogrodu\\235628361.jpg",
+      "true_category": "Dom i Ogród",
+      "predicted_categories": [
+        "Motoryzacja",
+        "Supermarket"
+      ],
+      "top_scores": [
+        [
+          "Motoryzacja",
+          0.3284
+        ],
+        [
+          "Supermarket",
+          0.318
+        ]
+      ]
+    },
+    {
+      "product_id": "151092698",
+      "image_path": "C:\\Users\\User\\PycharmProjects\\ERLI-Rekrut\\data\\raw\\Dom i Ogród\\Wyposażenie\\151092698.jpg",
+      "true_category": "Dom i Ogród",
+      "predicted_categories": [
+        "Supermarket",
+        "Zdrowie"
+      ],
+      "top_scores": [
+        [
+          "Supermarket",
+          0.2909
+        ],
+        [
+          "Zdrowie",
+          0.2464
+        ]
+      ]
+    },
+    {
+      "product_id": "153694497",
+      "image_path": "C:\\Users\\User\\PycharmProjects\\ERLI-Rekrut\\data\\raw\\Dom i Ogród\\Nawozy i preparaty do ogrodu\\153694497.jpg",
+      "true_category": "Dom i Ogród",
+      "predicted_categories": [
+        "Supermarket",
+        "Zdrowie"
+      ],
+      "top_scores": [
+        [
+          "Supermarket",
+          0.4934
+        ],
+        [
+          "Zdrowie",
+          0.3607
+        ]
+      ]
+    },
+    {
+      "product_id": "278623088",
+      "image_path": "C:\\Users\\User\\PycharmProjects\\ERLI-Rekrut\\data\\raw\\Dom i Ogród\\Oczko wodne do ogrodu\\278623088.jpg",
+      "true_category": "Dom i Ogród",
+      "predicted_categories": [
+        "Firma",
+        "Motoryzacja"
+      ],
+      "top_scores": [
+        [
+          "Firma",
+          0.2459
+        ],
+        [
+          "Motoryzacja",
+          0.2386
+        ]
+      ]
+    },
+    {
+      "product_id": "350616045",
+      "image_path": "C:\\Users\\User\\PycharmProjects\\ERLI-Rekrut\\data\\raw\\Dziecko\\Ręczniki i okrycia dla dzieci\\350616045.jpg",
+      "true_category": "Dziecko",
+      "predicted_categories": [
+        "Elektronika",
+        "Kultura i rozrywka"
+      ],
+      "top_scores": [
+        [
+          "Elektronika",
+          0.341
+        ],
+        [
+          "Kultura i rozrywka",
+          0.2952
+        ]
+      ]
+    },
+    {
+      "product_id": "269857029",
+      "image_path": "C:\\Users\\User\\PycharmProjects\\ERLI-Rekrut\\data\\raw\\Dziecko\\Pieluchy tetrowe i chusteczki nawilżane dla dzieci\\269857029.jpg",
+      "true_category": "Dziecko",
+      "predicted_categories": [
+        "Uroda",
+        "Dom i Ogród"
+      ],
+      "top_scores": [
+        [
+          "Uroda",
+          0.3195
+        ],
+        [
+          "Dom i Ogród",
+          0.2288
+        ]
+      ]
+    },
+    {
+      "product_id": "256237942",
+      "image_path": "C:\\Users\\User\\PycharmProjects\\ERLI-Rekrut\\data\\raw\\Dziecko\\Pieluchy tetrowe i chusteczki nawilżane dla dzieci\\256237942.jpg",
+      "true_category": "Dziecko",
+      "predicted_categories": [
+        "Uroda",
+        "Dziecko"
+      ],
+      "top_scores": [
+        [
+          "Uroda",
+          0.4907
+        ],
+        [
+          "Dziecko",
+          0.3229
+        ]
+      ]
+    },
+    {
+      "product_id": "176058851",
+      "image_path": "C:\\Users\\User\\PycharmProjects\\ERLI-Rekrut\\data\\raw\\Dziecko\\Okazje, imprezy\\176058851.jpg",
+      "true_category": "Dziecko",
+      "predicted_categories": [
+        "Moda",
+        "Uroda",
+        "Dom i Ogród"
+      ],
+      "top_scores": [
+        [
+          "Moda",
+          0.3373
+        ],
+        [
+          "Uroda",
+          0.3172
+        ],
+        [
+          "Dom i Ogród",
+          0.2015
+        ]
+      ]
+    },
+    {
+      "product_id": "212288947",
+      "image_path": "C:\\Users\\User\\PycharmProjects\\ERLI-Rekrut\\data\\raw\\Elektronika\\Karty pamięci do aparatu\\212288947.jpg",
+      "true_category": "Elektronika",
+      "predicted_categories": [
+        "Elektronika",
+        "Motoryzacja"
+      ],
+      "top_scores": [
+        [
+          "Elektronika",
+          0.2835
+        ],
+        [
+          "Motoryzacja",
+          0.202
+        ]
+      ]
+    }
+  ]
+}

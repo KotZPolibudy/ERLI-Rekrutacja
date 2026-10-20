@@ -90,14 +90,22 @@ def save_jsonl(records: List[Union[ProductMetadata, CategoryPrediction, FashionD
 
 def load_metadata_jsonl(input_path: Union[str, Path]) -> List[ProductMetadata]:
     """Wczytuje listę ProductMetadata z pliku JSONL."""
+    return list(iter_metadata_jsonl(input_path))
+
+
+def iter_metadata_jsonl(input_path: Union[str, Path]):
+    """Generator strumieniowy czytający rekordy ProductMetadata z pliku JSONL linia po linii (stała pamięć O(1)).
+    Kluczowy dla baz danych o skali setek tysięcy i milionów produktów.
+    """
     input_path = Path(input_path)
     if not input_path.exists():
-        return []
-    records: List[ProductMetadata] = []
+        return
     with open(input_path, "r", encoding="utf-8") as f:
         for line in f:
             line = line.strip()
             if line:
-                data = json.loads(line)
-                records.append(ProductMetadata.model_validate(data))
-    return records
+                try:
+                    data = json.loads(line)
+                    yield ProductMetadata.model_validate(data)
+                except Exception:
+                    continue

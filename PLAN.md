@@ -83,16 +83,17 @@ Każdy wiersz w `data/raw/metadata.jsonl`:
 ---
 
 ### Strumień B (Agent 2): Klasyfikator Kategorii (`src/classification`)
-*Może pracować równolegle ze Strumieniem A (korzysta z mocków ze Strumienia 0, a po ukończeniu A przełącza się na pełne dane).*
-- **Zadanie B1**: Moduł wczytywania danych (`ProductDataset`, walidacja poprawności plików graficznych, obsługa braków/błędnych formatów).
-- **Zadanie B2**: Dobór i implementacja modelu:
-  - *Opcja A (Rekomendowana dla prototypu z małą próbką)*: Zero-shot / Few-shot Vision-Language Model (np. `google/siglip-base-patch16-224` lub `openai/clip-vit-base-patch32`) – natychmiastowa gotowość bez długiego trenowania, wysoka uogólnialność na kategorie e-commerce.
-  - *Opcja B (Baseline)*: Lekki transfer learning (np. fine-tuning warstwy liniowej na embeddingach SigLIP / ResNet50 / MobileNetV3).
-- **Zadanie B3**: Pipeline inferencji jedno- i wielo-obrazowej (`predict_category(image) -> CategoryPrediction`).
-- **Zadanie B4**: Zapis predykcji wraz z poziomem pewności (confidence/probabilities) do dalszej ewaluacji.
-- **Zadanie B5 (Multi-label Ready)**: Przygotowanie pipeline'u na przypadek multi-label:
-  - Progowanie sigmoidalne (thresholding na poziomie np. >= 0.35 dla wielu kategorii równocześnie).
-  - Wykrywanie nakładających się kategorii (np. Moda + Sport, Dziecko + Zabawki/Elektronika) i zapis listy `predicted_categories`.
+*Zrealizowany i zoptymalizowany dla scenariuszy Multi-Label.*
+- [x] **Zadanie B1**: Moduł wczytywania danych (`ProductDataset`, walidacja poprawności plików graficznych, stratyfikowany podział `create_train_val_test_split`).
+- [x] **Zadanie B2**: Dobór i implementacja modeli:
+  - *SigLIP (Google, `google/siglip-base-patch16-224`)*: Architektura Vision-Language z sigmoid loss – natywne wsparcie dla multi-label, precyzyjnie skalibrowane logity bez arbitralnego biasu WebLI.
+  - *CLIP (OpenAI, `openai/clip-vit-base-patch32`)*: Architektura baseline z softmax loss.
+  - *Linear Probe (One-vs-Rest Logistic Regression)*: Głowica nadzorowana uczona na zamrożonych embeddingach SigLIP.
+- [x] **Zadanie B3**: Pipeline inferencji jedno- i wielo-obrazowej (`predict_category(image) -> CategoryPrediction`).
+- [x] **Zadanie B4**: Zapis predykcji wraz z poziomem pewności (confidence/probabilities) i czasem inferencji do JSONL.
+- [x] **Zadanie B5 (Multi-label Ready)**: Pełna obsługa multi-label:
+  - Progowanie sigmoidalne (thresholding >= 0.35).
+  - Wykrywanie nakładających się kategorii (np. odzież sportowa = Moda + Sport i turystyka).
 
 ---
 
@@ -109,21 +110,17 @@ Każdy wiersz w `data/raw/metadata.jsonl`:
 
 ---
 
-### Strumień D (Agent 4): Ewaluacja, Analiza Błędów i Raport (`src/evaluation` + Dokumentacja)
-*Działa równolegle – najpierw tworzy skrypty ewaluacji na danych mockowych, a na koniec generuje finalny raport.*
-- **Zadanie D1**: Implementacja metryk klasyfikacji:
-  - Accuracy, Balanced Accuracy, Precision, Recall, F1 (macro/weighted).
-  - Generowanie macierzy pomyłek (Confusion Matrix) i wykresów w `matplotlib/seaborn`.
-- **Zadanie D2**: Moduł pomiaru wydajności (Profiling):
-  - Pomiar czasu inferencji (średnia, p95, p99, throughput FPS).
-- **Zadanie D3**: Moduł analizy błędów:
-  - Wyszukiwanie top-k najbardziej niepewnych i błędnych predykcji.
-  - Analiza jakościowa: dlaczego model się myli (np. wieloznaczne tło, akcesoria, kategoria "Dziecko" vs "Moda").
-- **Zadanie D4**: Raport końcowy (`FINAL_REPORT.md` / wnioski):
-  - Co działa, a co nie.
-  - Rekomendacje rozwoju produkcyjnego (MLOps, feature store, vector search, active learning).
-  - Wymogi pracy zespołowej (lintery, testy CI, wersjonowanie danych DVC).
-  - Deklaracja użycia narzędzi AI.
+### Strumień D (Agent 4): Ewaluacja, Analiza Błędów i Raport (`src/evaluation` + Raporty)
+*Zrealizowany i zintegrowany ze Strumieniem B.*
+- [x] **Zadanie D1**: Implementacja metryk klasyfikacji:
+  - Top-1 Accuracy, Top-3 Accuracy, Balanced Accuracy, Precision, Recall, Macro/Weighted F1, Multi-Label Jaccard Index, Hamming Loss.
+  - Generowanie macierzy pomyłek (Confusion Matrix) w formacie tekstowym ASCII oraz graficznym PNG (`reports/confusion_matrix_*.png`).
+- [x] **Zadanie D2**: Moduł pomiaru wydajności (Profiling):
+  - Dokładny pomiar latencji per-item (ms) oraz przepustowości (FPS).
+- [x] **Zadanie D3**: Moduł analizy błędów:
+  - Zapis błędów i wykrytych przypadków multi-label do `reports/error_analysis_*.json`.
+  - Identyfikacja zjawiska Label Noise na rzeczywistych danych Erli (np. dekoracje ślubne / pudełka na ciasto zaklasyfikowane przez sprzedawców do kategorii "Moda").
+- [x] **Zadanie D4**: Raport porównawczy Markdown i JSON (`reports/classification_report.md`, `reports/benchmark_summary.json`).
 
 ---
 

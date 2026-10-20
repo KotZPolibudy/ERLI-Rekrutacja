@@ -1,0 +1,16 @@
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: erli-rabbitmq
+    restart: unless-stopped
+    ports:
+      - "5672:5672"    # Port protokołu AMQP (komunikacja workerów i producentów)
+      - "15672:15672"  # Web UI panelu zarządzania RabbitMQ Management (http://localhost:15672, login: guest / guest)
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+
+volumes:
+  rabbitmq_data:

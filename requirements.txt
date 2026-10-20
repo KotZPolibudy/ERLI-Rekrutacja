@@ -2,6 +2,8 @@
 torch>=2.5.0
 torchvision>=0.20.0
 transformers>=4.46.0
+sentencepiece>=0.2.0
+protobuf>=5.0.0
 accelerate>=1.0.0
 
 # Computer Vision & Detection (YOLO11 / YOLOv8 support)
@@ -26,3 +28,7 @@ tqdm>=4.66.5
 
 # Testing & Quality
 pytest>=8.3.0
+
+# Distributed Queue & Messaging (Scalable Production Architecture)
+pika>=1.3.0
+

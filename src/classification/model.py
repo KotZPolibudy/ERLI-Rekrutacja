@@ -131,73 +131,88 @@ class SigLIPClassifier(BaseClassifier):
         product_ids: Optional[List[str]] = None,
         true_categories: Optional[List[str]] = None,
         threshold: float = 0.35,
+        max_chunk_size: int = 64,
     ) -> List[CategoryPrediction]:
         t0 = time.perf_counter()
-        loaded_images: List[Image.Image] = []
-        paths: List[str] = []
+        results: List[CategoryPrediction] = []
+        n_total = len(images)
 
-        for img in images:
-            if isinstance(img, (str, Path)):
-                paths.append(str(img))
-                with Image.open(img) as pil_img:
-                    loaded_images.append(pil_img.convert("RGB"))
-            else:
-                paths.append("in_memory")
-                loaded_images.append(img.convert("RGB"))
+        # Wewnętrzne stronicowanie na wypadek przekazania bardzo dużej listy obrazów
+        for start_idx in range(0, n_total, max_chunk_size):
+            end_idx = min(start_idx + max_chunk_size, n_total)
+            chunk_images = images[start_idx:end_idx]
+            chunk_pids = product_ids[start_idx:end_idx] if product_ids else None
+            chunk_tcats = true_categories[start_idx:end_idx] if true_categories else None
 
-        with torch.no_grad():
-            image_inputs = self.processor(images=loaded_images, return_tensors="pt").to(self.device)
-            image_features = _extract_tensor(self.model.get_image_features(**image_inputs))
-            image_features = image_features / image_features.norm(dim=-1, keepdim=True)
+            loaded_images: List[Image.Image] = []
+            paths: List[str] = []
 
-            # Obliczenie logitów (podobieństwo cosinusowe ze skalą SigLIP, bez marginalnego WebLI biasu)
-            logit_scale = torch.clamp(self.model.logit_scale.exp(), max=100.0)
-            unbiased_logits = (image_features @ self.text_features.T) * logit_scale
-            # SigLIP używa SIGMOID dla niezależnych prawdopodobieństw wieloetykietowych
-            probabilities = torch.sigmoid(unbiased_logits * 0.5).cpu().numpy()
+            for img in chunk_images:
+                if isinstance(img, (str, Path)):
+                    paths.append(str(img))
+                    with Image.open(img) as pil_img:
+                        loaded_images.append(pil_img.convert("RGB"))
+                else:
+                    paths.append("in_memory")
+                    loaded_images.append(img.convert("RGB"))
+
+            with torch.no_grad():
+                image_inputs = self.processor(images=loaded_images, return_tensors="pt").to(self.device)
+                image_features = _extract_tensor(self.model.get_image_features(**image_inputs))
+                image_features = image_features / image_features.norm(dim=-1, keepdim=True)
+
+                # Obliczenie logitów (podobieństwo cosinusowe ze skalą SigLIP, bez marginalnego WebLI biasu)
+                logit_scale = torch.clamp(self.model.logit_scale.exp(), max=100.0)
+                unbiased_logits = (image_features @ self.text_features.T) * logit_scale
+                # SigLIP używa SIGMOID dla niezależnych prawdopodobieństw wieloetykietowych
+                probabilities = torch.sigmoid(unbiased_logits * 0.5).cpu().numpy()
+
+            del image_inputs, image_features, unbiased_logits, loaded_images
+            if torch.cuda.is_available():
+                torch.cuda.empty_cache()
+
+            for i, probs in enumerate(probabilities):
+                p_id = chunk_pids[i] if chunk_pids else f"item_{start_idx + i}"
+                true_cat = chunk_tcats[i] if chunk_tcats else None
+                img_path = paths[i]
+
+                # Posortuj kategorie malejąco po prawdopodobieństwie
+                sorted_indices = np.argsort(probs)[::-1]
+                top_k = [
+                    CategoryScore(category=self.categories[idx], score=float(probs[idx]))
+                    for idx in sorted_indices
+                ]
+
+                # Najbardziej prawdopodobna kategoria (single-label)
+                best_cat = top_k[0].category
+                best_conf = top_k[0].score
+
+                # Wieloetykietowość (multi-label) – wszystkie kategorie powyżej progu threshold
+                multilabel_cats = [
+                    self.categories[idx]
+                    for idx in sorted_indices
+                    if probs[idx] >= threshold
+                ]
+                if not multilabel_cats:
+                    multilabel_cats = [best_cat]
+
+                results.append(CategoryPrediction(
+                    product_id=p_id,
+                    image_path=img_path,
+                    true_category=true_cat,
+                    true_categories=[true_cat] if true_cat else [],
+                    predicted_category=best_cat,
+                    predicted_categories=multilabel_cats,
+                    is_multilabel=(len(multilabel_cats) > 1),
+                    confidence=best_conf,
+                    top_k_predictions=top_k,
+                    latency_ms=0.0,
+                ))
 
         elapsed_total_ms = (time.perf_counter() - t0) * 1000.0
-        per_item_latency_ms = elapsed_total_ms / max(1, len(images))
-
-        results: List[CategoryPrediction] = []
-        for i, probs in enumerate(probabilities):
-            p_id = product_ids[i] if product_ids else f"item_{i}"
-            true_cat = true_categories[i] if true_categories else None
-            img_path = paths[i]
-
-            # Posortuj kategorie malejąco po prawdopodobieństwie
-            sorted_indices = np.argsort(probs)[::-1]
-            top_k = [
-                CategoryScore(category=self.categories[idx], score=float(probs[idx]))
-                for idx in sorted_indices
-            ]
-
-            # Najbardziej prawdopodobna kategoria (single-label)
-            best_cat = top_k[0].category
-            best_conf = top_k[0].score
-
-            # Wieloetykietowość (multi-label) – wszystkie kategorie powyżej progu threshold
-            multilabel_cats = [
-                self.categories[idx]
-                for idx in sorted_indices
-                if probs[idx] >= threshold
-            ]
-            if not multilabel_cats:
-                # Jeśli żadna nie przekracza progu, weź najwyższą
-                multilabel_cats = [best_cat]
-
-            results.append(CategoryPrediction(
-                product_id=p_id,
-                image_path=img_path,
-                true_category=true_cat,
-                true_categories=[true_cat] if true_cat else [],
-                predicted_category=best_cat,
-                predicted_categories=multilabel_cats,
-                is_multilabel=(len(multilabel_cats) > 1),
-                confidence=best_conf,
-                top_k_predictions=top_k,
-                latency_ms=per_item_latency_ms,
-            ))
+        per_item_latency_ms = elapsed_total_ms / max(1, n_total)
+        for r in results:
+            r.latency_ms = per_item_latency_ms
 
         return results
 
@@ -258,64 +273,79 @@ class CLIPClassifier(BaseClassifier):
         product_ids: Optional[List[str]] = None,
         true_categories: Optional[List[str]] = None,
         threshold: float = 0.20,
+        max_chunk_size: int = 64,
     ) -> List[CategoryPrediction]:
         t0 = time.perf_counter()
-        loaded_images = []
-        paths = []
+        results: List[CategoryPrediction] = []
+        n_total = len(images)
 
-        for img in images:
-            if isinstance(img, (str, Path)):
-                paths.append(str(img))
-                with Image.open(img) as pil_img:
-                    loaded_images.append(pil_img.convert("RGB"))
-            else:
-                paths.append("in_memory")
-                loaded_images.append(img.convert("RGB"))
+        for start_idx in range(0, n_total, max_chunk_size):
+            end_idx = min(start_idx + max_chunk_size, n_total)
+            chunk_images = images[start_idx:end_idx]
+            chunk_pids = product_ids[start_idx:end_idx] if product_ids else None
+            chunk_tcats = true_categories[start_idx:end_idx] if true_categories else None
 
-        with torch.no_grad():
-            image_inputs = self.processor(images=loaded_images, return_tensors="pt").to(self.device)
-            image_features = _extract_tensor(self.model.get_image_features(**image_inputs))
-            image_features = image_features / image_features.norm(dim=-1, keepdim=True)
+            loaded_images = []
+            paths = []
 
-            # CLIP używa SOFTMAX
-            logits = (image_features @ self.text_features.T) * self.model.logit_scale.exp()
-            probabilities = torch.softmax(logits, dim=-1).cpu().numpy()
+            for img in chunk_images:
+                if isinstance(img, (str, Path)):
+                    paths.append(str(img))
+                    with Image.open(img) as pil_img:
+                        loaded_images.append(pil_img.convert("RGB"))
+                else:
+                    paths.append("in_memory")
+                    loaded_images.append(img.convert("RGB"))
+
+            with torch.no_grad():
+                image_inputs = self.processor(images=loaded_images, return_tensors="pt").to(self.device)
+                image_features = _extract_tensor(self.model.get_image_features(**image_inputs))
+                image_features = image_features / image_features.norm(dim=-1, keepdim=True)
+
+                # CLIP używa SOFTMAX
+                logits = (image_features @ self.text_features.T) * self.model.logit_scale.exp()
+                probabilities = torch.softmax(logits, dim=-1).cpu().numpy()
+
+            del image_inputs, image_features, logits, loaded_images
+            if torch.cuda.is_available():
+                torch.cuda.empty_cache()
+
+            for i, probs in enumerate(probabilities):
+                p_id = chunk_pids[i] if chunk_pids else f"item_{start_idx + i}"
+                true_cat = chunk_tcats[i] if chunk_tcats else None
+                img_path = paths[i]
+
+                sorted_indices = np.argsort(probs)[::-1]
+                top_k = [
+                    CategoryScore(category=self.categories[idx], score=float(probs[idx]))
+                    for idx in sorted_indices
+                ]
+                best_cat = top_k[0].category
+                best_conf = top_k[0].score
+
+                multilabel_cats = [
+                    self.categories[idx]
+                    for idx in sorted_indices
+                    if probs[idx] >= threshold
+                ] or [best_cat]
+
+                results.append(CategoryPrediction(
+                    product_id=p_id,
+                    image_path=img_path,
+                    true_category=true_cat,
+                    true_categories=[true_cat] if true_cat else [],
+                    predicted_category=best_cat,
+                    predicted_categories=multilabel_cats,
+                    is_multilabel=(len(multilabel_cats) > 1),
+                    confidence=best_conf,
+                    top_k_predictions=top_k,
+                    latency_ms=0.0,
+                ))
 
         elapsed_total_ms = (time.perf_counter() - t0) * 1000.0
-        per_item_latency_ms = elapsed_total_ms / max(1, len(images))
-
-        results: List[CategoryPrediction] = []
-        for i, probs in enumerate(probabilities):
-            p_id = product_ids[i] if product_ids else f"item_{i}"
-            true_cat = true_categories[i] if true_categories else None
-            img_path = paths[i]
-
-            sorted_indices = np.argsort(probs)[::-1]
-            top_k = [
-                CategoryScore(category=self.categories[idx], score=float(probs[idx]))
-                for idx in sorted_indices
-            ]
-            best_cat = top_k[0].category
-            best_conf = top_k[0].score
-
-            multilabel_cats = [
-                self.categories[idx]
-                for idx in sorted_indices
-                if probs[idx] >= threshold
-            ] or [best_cat]
-
-            results.append(CategoryPrediction(
-                product_id=p_id,
-                image_path=img_path,
-                true_category=true_cat,
-                true_categories=[true_cat] if true_cat else [],
-                predicted_category=best_cat,
-                predicted_categories=multilabel_cats,
-                is_multilabel=(len(multilabel_cats) > 1),
-                confidence=best_conf,
-                top_k_predictions=top_k,
-                latency_ms=per_item_latency_ms,
-            ))
+        per_item_latency_ms = elapsed_total_ms / max(1, n_total)
+        for r in results:
+            r.latency_ms = per_item_latency_ms
 
         return results
 
@@ -333,29 +363,58 @@ class LinearProbeClassifier(BaseClassifier):
     def get_model_name(self) -> str:
         return "LinearProbe (SigLIP Features + Multi-Label Logistic Regression)"
 
-    def fit(self, images: List[Union[str, Path, Image.Image]], targets: np.ndarray) -> None:
-        """Uczy głowicę klasyfikacyjną na wektorach cech i macierzy etykiet (multi-hot lub one-hot)."""
-        logger.info("Ekstrakcja embeddingów dla %d próbek treningowych...", len(images))
-        X = self._extract_features(images)
-        logger.info("Trenowanie klasyfikatora One-vs-Rest...")
+    def fit(
+        self,
+        images: List[Union[str, Path, Image.Image]],
+        targets: np.ndarray,
+        batch_size: int = 64,
+    ) -> None:
+        """Uczy głowicę klasyfikacyjną na wektorach cech i macierzy etykiet (multi-hot lub one-hot).
+        Bezpiecznie przetwarza dane partiami (batch_size), zapobiegając przepełnieniu VRAM GPU.
+        """
+        logger.info("Ekstrakcja embeddingów dla %d próbek treningowych (batch_size=%d)...", len(images), batch_size)
+        X = self._extract_features(images, batch_size=batch_size)
+        logger.info("Trenowanie klasyfikatora One-vs-Rest na %d wektorach...", len(X))
         self.clf.fit(X, targets)
         self.is_fitted = True
         logger.info("Linear Probe został pomyślnie wytrenowany.")
 
-    def _extract_features(self, images: List[Union[str, Path, Image.Image]]) -> np.ndarray:
-        loaded = []
-        for img in images:
-            if isinstance(img, (str, Path)):
-                with Image.open(img) as pil_img:
-                    loaded.append(pil_img.convert("RGB"))
-            else:
-                loaded.append(img.convert("RGB"))
+    def _extract_features(
+        self,
+        images: List[Union[str, Path, Image.Image]],
+        batch_size: int = 64,
+    ) -> np.ndarray:
+        """Strumieniowa ekstrakcja embeddingów z pamięciowo bezpiecznym podziałem na paczki."""
+        all_feats: List[np.ndarray] = []
+        n_total = len(images)
 
-        with torch.no_grad():
-            inputs = self.feature_extractor.processor(images=loaded, return_tensors="pt").to(self.feature_extractor.device)
-            feats = _extract_tensor(self.feature_extractor.model.get_image_features(**inputs))
-            feats = feats / feats.norm(dim=-1, keepdim=True)
-            return feats.cpu().numpy()
+        for idx in range(0, n_total, batch_size):
+            chunk = images[idx : idx + batch_size]
+            loaded = []
+            for img in chunk:
+                if isinstance(img, (str, Path)):
+                    with Image.open(img) as pil_img:
+                        loaded.append(pil_img.convert("RGB"))
+                else:
+                    loaded.append(img.convert("RGB"))
+
+            with torch.no_grad():
+                inputs = self.feature_extractor.processor(images=loaded, return_tensors="pt").to(self.feature_extractor.device)
+                feats = _extract_tensor(self.feature_extractor.model.get_image_features(**inputs))
+                feats = feats / feats.norm(dim=-1, keepdim=True)
+                all_feats.append(feats.cpu().numpy())
+
+            del inputs, feats, loaded
+            if torch.cuda.is_available():
+                torch.cuda.empty_cache()
+
+            if n_total > batch_size and ((idx // batch_size) % 10 == 0 or idx + batch_size >= n_total):
+                print(f"  [Ekstrakcja cech Linear Probe] {min(idx + batch_size, n_total)}/{n_total}...", end="\r")
+
+        if n_total > batch_size:
+            print()
+
+        return np.vstack(all_feats) if all_feats else np.empty((0, 768))
 
     def predict_image(
         self,
@@ -372,12 +431,13 @@ class LinearProbeClassifier(BaseClassifier):
         product_ids: Optional[List[str]] = None,
         true_categories: Optional[List[str]] = None,
         threshold: float = 0.35,
+        batch_size: int = 64,
     ) -> List[CategoryPrediction]:
         if not self.is_fitted:
             raise RuntimeError("LinearProbeClassifier musi zostać najpierw wytrenowany metodą fit()!")
 
         t0 = time.perf_counter()
-        feats = self._extract_features(images)
+        feats = self._extract_features(images, batch_size=batch_size)
         probabilities = self.clf.predict_proba(feats)
         elapsed_total_ms = (time.perf_counter() - t0) * 1000.0
         per_item_latency_ms = elapsed_total_ms / max(1, len(images))
@@ -416,3 +476,4 @@ class LinearProbeClassifier(BaseClassifier):
             ))
 
         return results
+

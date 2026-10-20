@@ -6,26 +6,26 @@
 
 | Model | Top-1 Accuracy | Top-3 Accuracy | Balanced Acc | Macro F1 | Weighted F1 | Multi-Label Jaccard | Latencja (CPU) | Przepustowość |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| **SigLIP (Multi-Label Sigmoid)** | 45.00% | 73.33% | 45.00% | 44.14% | 44.14% | 36.92% | 107.9 ms | 9.3 FPS |
-| **CLIP (Softmax Baseline)** | 45.42% | 68.75% | 45.42% | 43.92% | 43.92% | 45.07% | 25.1 ms | 39.9 FPS |
-| **Linear Probe (SigLIP Features)** | 55.83% | 78.75% | 55.83% | 55.10% | 55.10% | 55.83% | 107.5 ms | 9.3 FPS |
+| **SigLIP (Multi-Label Sigmoid)** | 46.16% | 70.60% | 46.16% | 44.99% | 44.99% | 34.85% | 10.4 ms | 96.2 FPS |
+| **CLIP (Softmax Baseline)** | 43.50% | 67.92% | 43.50% | 42.74% | 42.74% | 41.66% | 3.8 ms | 260.9 FPS |
+| **Linear Probe (SigLIP Features)** | 64.81% | 87.86% | 64.81% | 64.57% | 64.57% | 64.40% | 9.4 ms | 106.3 FPS |
 
 ## 2. Szczegółowe metryki F1-Score per kategoria główna
 
 | Kategoria | Liczba próbek | **SigLIP (Multi-Label Sigmoid)** F1 | **CLIP (Softmax Baseline)** F1 | **Linear Probe (SigLIP Features)** F1 |
 | :--- | :---: | :---: | :---: | :---: |
-| Dom i Ogród | 20 | 30.8% | 24.4% | 18.2% |
-| Dziecko | 20 | 51.1% | 52.4% | 63.6% |
-| Elektronika | 20 | 33.3% | 40.0% | 48.6% |
-| Firma | 20 | 44.0% | 40.0% | 52.6% |
-| Kolekcje i sztuka | 20 | 32.3% | 26.1% | 50.0% |
-| Kultura i rozrywka | 20 | 32.0% | 41.4% | 55.6% |
-| Moda | 20 | 52.6% | 63.6% | 68.3% |
-| Motoryzacja | 20 | 66.7% | 53.6% | 56.0% |
-| Sport i turystyka | 20 | 42.9% | 27.0% | 54.1% |
-| Supermarket | 20 | 52.9% | 61.5% | 60.9% |
-| Uroda | 20 | 60.4% | 54.9% | 76.9% |
-| Zdrowie | 20 | 30.8% | 42.1% | 56.4% |
+| Dom i Ogród | 4500 | 41.1% | 31.6% | 51.3% |
+| Dziecko | 4500 | 56.2% | 49.4% | 68.3% |
+| Elektronika | 4500 | 39.7% | 49.2% | 70.8% |
+| Firma | 4500 | 39.3% | 30.5% | 48.6% |
+| Kolekcje i sztuka | 4500 | 33.1% | 22.9% | 51.7% |
+| Kultura i rozrywka | 4500 | 40.9% | 42.4% | 69.7% |
+| Moda | 4500 | 58.8% | 54.9% | 71.9% |
+| Motoryzacja | 4500 | 50.1% | 47.1% | 68.8% |
+| Sport i turystyka | 4500 | 41.0% | 43.0% | 62.5% |
+| Supermarket | 4500 | 54.8% | 50.4% | 71.3% |
+| Uroda | 4500 | 62.7% | 56.3% | 77.6% |
+| Zdrowie | 4500 | 22.3% | 35.2% | 62.4% |
 
 ## 3. Kluczowe wnioski biznesowe i architektoniczne
 

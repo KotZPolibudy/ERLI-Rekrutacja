@@ -55,19 +55,36 @@ class CategoryPrediction(BaseModel):
 
 class BBox(BaseModel):
     """Pojedynczy bounding box dla detekcji elementu ubioru."""
-    x1: float = Field(description="Współrzędna lewej krawędzi (piksele lub znormalizowane 0-1)")
-    y1: float = Field(description="Współrzędna górnej krawędzi")
-    x2: float = Field(description="Współrzędna prawej krawędzi")
-    y2: float = Field(description="Współrzędna dolnej krawędzi")
+    x1: float = Field(description="Współrzędna lewej krawędzi (piksele)")
+    y1: float = Field(description="Współrzędna górnej krawędzi (piksele)")
+    x2: float = Field(description="Współrzędna prawej krawędzi (piksele)")
+    y2: float = Field(description="Współrzędna dolnej krawędzi (piksele)")
     label: str = Field(description="Nazwa wykrytego elementu (np. dress, jacket, pants, shoes)")
+    label_pl: Optional[str] = Field(default=None, description="Polska nazwa elementu garderoby")
     confidence: float = Field(description="Poziom pewności detekcji (0-1)")
+
+    @property
+    def width(self) -> float:
+        return max(0.0, self.x2 - self.x1)
+
+    @property
+    def height(self) -> float:
+        return max(0.0, self.y2 - self.y1)
+
+    @property
+    def area(self) -> float:
+        return self.width * self.height
 
 
 class FashionDetectionResult(BaseModel):
     """Wynik detekcji elementów ubioru dla danego zdjęcia."""
     product_id: str
     image_path: str
-    detections: List[BBox] = Field(default_factory=list)
+    image_width: Optional[int] = Field(default=None, description="Szerokość obrazu w pikselach")
+    image_height: Optional[int] = Field(default=None, description="Wysokość obrazu w pikselach")
+    detections: List[BBox] = Field(default_factory=list, description="Lista wykrytych elementów garderoby")
+    item_count: int = Field(default=0, description="Łączna liczba wykrytych elementów")
+    dominant_item: Optional[str] = Field(default=None, description="Dominujący element garderoby (o największym polu / pewności)")
     latency_ms: float = Field(description="Czas wykonania detekcji w ms")
 
 

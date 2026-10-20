@@ -28,3 +28,11 @@ build/
 
 # data
 /data
+/reports
+
+# Model weights
+*.pt
+*.pth
+*.onnx
+*.bin
+

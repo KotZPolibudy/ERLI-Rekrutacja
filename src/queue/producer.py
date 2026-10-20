@@ -99,18 +99,27 @@ class RabbitMQProducer:
             logger.error("Błąd podczas publikacji produktu %s: %s", product.product_id, e)
             return False
 
-    def publish_stream(self, metadata_path: Path, limit: Optional[int] = None) -> int:
-        """Publikuje strumień produktów z pliku metadata.jsonl do RabbitMQ."""
+    def publish_stream(
+        self,
+        metadata_path: Path,
+        limit: Optional[int] = None,
+        category_filter: Optional[str] = None,
+    ) -> int:
+        """Publikuje strumień produktów z pliku metadata.jsonl do RabbitMQ z opcjonalnym filtrem kategorii."""
         if not self.connect():
             raise ConnectionError(
                 f"Brak połączenia z brokerem RabbitMQ na {self.host}:{self.port}. "
-                "Upewnij się, że RabbitMQ działa (np. przez Docker: `docker run -d -p 5672:5672 -p 15672:15672 rabbitmq:3-management`)."
+                "Upewnij się, że RabbitMQ działa (np. przez Docker: `docker compose up -d`)."
             )
 
         sent_count = 0
-        logger.info("Rozpoczynanie strumieniowego zasilania kolejki z %s...", metadata_path)
+        filter_msg = f" (filtr kategorii: {category_filter})" if category_filter else ""
+        logger.info("Rozpoczynanie zasilania kolejki '%s'%s z %s...", self.queue_name, filter_msg, metadata_path)
 
         for record in iter_metadata_jsonl(metadata_path):
+            if category_filter and record.category_main != category_filter:
+                continue
+
             img_p = PROJECT_ROOT / record.local_image_path
             if not img_p.exists():
                 continue
@@ -119,12 +128,12 @@ class RabbitMQProducer:
             if success:
                 sent_count += 1
                 if sent_count % 100 == 0:
-                    print(f"  Wysłano do kolejki RabbitMQ: {sent_count} zadań...", end="\r")
+                    print(f"  Wysłano do kolejki RabbitMQ ({self.queue_name}): {sent_count} zadań...", end="\r")
 
             if limit and sent_count >= limit:
                 break
 
-        print(f"\nZakończono publikację. Łącznie wysłano {sent_count} zadań do kolejki {self.queue_name}.")
+        print(f"\nZakończono publikację. Łącznie wysłano {sent_count} zadań do kolejki '{self.queue_name}'.")
         return sent_count
 
     def close(self):
@@ -136,13 +145,28 @@ def main():
     parser = argparse.ArgumentParser(description="Producent zadań RabbitMQ dla platformy Erli")
     parser.add_argument("--metadata", type=Path, default=DEFAULT_METADATA_PATH, help="Ścieżka do metadata.jsonl")
     parser.add_argument("--limit", type=int, default=None, help="Maksymalna liczba zadań do wysłania")
+    parser.add_argument("--queue", type=str, default=None, help="Docelowa nazwa kolejki (domyślnie CLASSIFICATION_QUEUE)")
+    parser.add_argument("--fashion-only", action="store_true", help="Wysyła wyłącznie produkty z kategorii Moda (np. do kolejki detekcji)")
+    parser.add_argument("--category", type=str, default=None, help="Filtruj wysyłane produkty po wybranej kategorii")
     parser.add_argument("--host", type=str, default=RABBITMQ_HOST, help="Adres hosta RabbitMQ")
     parser.add_argument("--port", type=int, default=RABBITMQ_PORT, help="Port RabbitMQ")
     args = parser.parse_args()
 
-    producer = RabbitMQProducer(host=args.host, port=args.port)
+    # Wybór kolejki
+    target_queue = args.queue
+    cat_filter = args.category
+    if args.fashion_only:
+        cat_filter = "Moda"
+        if not target_queue:
+            from src.queue.config import DETECTION_QUEUE
+            target_queue = DETECTION_QUEUE
+
+    if not target_queue:
+        target_queue = CLASSIFICATION_QUEUE
+
+    producer = RabbitMQProducer(host=args.host, port=args.port, queue_name=target_queue)
     try:
-        producer.publish_stream(args.metadata, limit=args.limit)
+        producer.publish_stream(args.metadata, limit=args.limit, category_filter=cat_filter)
     finally:
         producer.close()
 

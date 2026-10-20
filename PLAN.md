@@ -98,15 +98,17 @@ Każdy wiersz w `data/raw/metadata.jsonl`:
 ---
 
 ### Strumień C (Agent 3): Detekcja Elementów Ubioru (`src/detection`)
-*Zgodnie z ustaleniami: realizowany na samym końcu, po pełnym wdrożeniu i opisaniu Strumieni A i B.*
-*Może pracować całkowicie niezależnie od klasyfikatora.*
-- **Zadanie C1**: Wybór pretrenowanego modelu detekcji modowej:
-  - Np. YOLOv8/YOLO11 z wagami COCO (klasy: person, tie, handbag, suitcase, backpack) lub wyspecjalizowany model zorientowany na modę (np. Fashionpedia / DeepFashion2 weights lub OWL-ViT / Grounding DINO dla detekcji otwartej typu `dress`, `jacket`, `pants`, `shoes`, `shirt`).
-- **Zadanie C2**: Implementacja `FashionDetector`:
-  - Przyjmowanie obrazu -> zwracanie listy detekcji: `[BBox(x1, y1, x2, y2, label, confidence)]`.
-- **Zadanie C3**: Moduł wizualizacji:
-  - Rysowanie bounding boxów, kolorowanie według kategorii ubrań, zapis przykładowych wyników do `reports/detections/`.
-- **Zadanie C4**: Benchmarking latencji detektora na CPU/GPU.
+*Zrealizowany i zoptymalizowany pod GPU CUDA oraz architekturę kolejkową RabbitMQ.*
+- [x] **Zadanie C1**: Wybór modelu detekcji modowej:
+  - Wdrożono model **YOLO-World (`yolov8s-worldv2.pt`)** – architekturę Vision-Language (Open-Vocabulary Object Detection) z bogatym słownikiem 28 klas ubrań (sukienki, buty, torebki, kurtki, spodnie, nakrycia głowy itp.) i polskim mapowaniem.
+- [x] **Zadanie C2**: Implementacja `FashionDetector` ([src/detection/detector.py](file:///c:/Users/User/PycharmProjects/ERLI-Rekrut/src/detection/detector.py)):
+  - Obsługa pojedynczego obrazu oraz batchowania na GPU CUDA z pamięciowym bezpieczeństwem ($O(1)$ VRAM).
+- [x] **Zadanie C3**: Moduł wizualizacji ([src/detection/visualize.py](file:///c:/Users/User/PycharmProjects/ERLI-Rekrut/src/detection/visualize.py)):
+  - Semantyczna paleta barw, zaokrąglone ramki i etykiety tekstowe (PL/EN) z pewnością detekcji oraz automatyczna mozaika do raportów (`reports/fashion_detection_mosaic.jpg`).
+- [x] **Zadanie C4**: Benchmarking i integracja z RabbitMQ:
+  - Skrypt benchmarku [src/detection/benchmark_detection.py](file:///c:/Users/User/PycharmProjects/ERLI-Rekrut/src/detection/benchmark_detection.py) (osiągnięto **82.7 FPS, 12.1 ms na obraz** na RTX 3070).
+  - Dedykowany worker RabbitMQ [src/queue/detection_worker.py](file:///c:/Users/User/PycharmProjects/ERLI-Rekrut/src/queue/detection_worker.py) dla kolejki `erli_product_detection`.
+
 
 ---
 

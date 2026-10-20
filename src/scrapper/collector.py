@@ -124,8 +124,9 @@ class ProductCollector:
                 self.collected_product_ids.add(prod_id)
                 sub_collected += 1
 
-                # Zapisuj na bieżąco, aby nie utracić postępu
-                save_jsonl(self.existing_metadata, self.metadata_path)
+                # Dopisz rekord natychmiastowo w trybie append (bezpieczne dla równoczesnego odczytu i szybkie)
+                with open(self.metadata_path, "a", encoding="utf-8") as f:
+                    f.write(record.model_dump_json() + "\n")
 
         logger.info("Zakończono pobieranie dla '%s'. Zebrano nowych: %d (Łącznie: %d/%d)",
                     category_main, len(new_records), self.count_collected_for_category(category_main), self.target_per_category)

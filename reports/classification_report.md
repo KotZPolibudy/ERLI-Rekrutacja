@@ -6,9 +6,9 @@
 
 | Model | Top-1 Accuracy | Top-3 Accuracy | Balanced Acc | Macro F1 | Weighted F1 | Multi-Label Jaccard | Latencja (CPU) | Przepustowość |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| **SigLIP (Multi-Label Sigmoid)** | 46.16% | 70.60% | 46.16% | 44.99% | 44.99% | 34.85% | 10.4 ms | 96.2 FPS |
-| **CLIP (Softmax Baseline)** | 43.50% | 67.92% | 43.50% | 42.74% | 42.74% | 41.66% | 3.8 ms | 260.9 FPS |
-| **Linear Probe (SigLIP Features)** | 64.81% | 87.86% | 64.81% | 64.57% | 64.57% | 64.40% | 9.4 ms | 106.3 FPS |
+| **SigLIP (Multi-Label Sigmoid)** | 46.16% | 70.60% | 46.16% | 44.99% | 44.99% | 34.85% | 6.2 ms | 160.2 FPS |
+| **CLIP (Softmax Baseline)** | 43.50% | 67.92% | 43.50% | 42.74% | 42.74% | 41.66% | 3.0 ms | 328.1 FPS |
+| **Linear Probe (SigLIP Features)** | 64.81% | 87.86% | 64.81% | 64.57% | 64.57% | 64.40% | 6.4 ms | 157.2 FPS |
 
 ## 2. Szczegółowe metryki F1-Score per kategoria główna
 

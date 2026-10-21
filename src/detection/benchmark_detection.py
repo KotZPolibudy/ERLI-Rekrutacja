@@ -40,9 +40,11 @@ logger = logging.getLogger("benchmark_detection")
 def collect_fashion_records(
     metadata_path: Path,
     limit: Optional[int] = 100,
-    seed: int = 42,
+    seed: Optional[int] = None,
 ) -> List[Tuple[str, Path, str]]:
-    """Wybiera reprezentatywną próbkę produktów modowych z metadanych z rotacją po podkategoriach."""
+    """Wybiera reprezentatywną próbkę produktów modowych z metadanych z rotacją po podkategoriach.
+    Jeśli seed is None, każdorazowo losowane są zupełnie inne próbki.
+    """
     by_subcat: Dict[str, List[Tuple[str, Path, str]]] = {}
 
     if metadata_path.exists():
@@ -67,7 +69,7 @@ def collect_fashion_records(
 
     logger.info("Znaleziono próbki modowe w %d podkategoriach.", len(by_subcat))
 
-    rng = random.Random(seed)
+    rng = random.Random(seed) if seed is not None else random.Random()
     selected: List[Tuple[str, Path, str]] = []
 
     if limit is None or limit <= 0:
@@ -88,6 +90,9 @@ def collect_fashion_records(
             needed = limit - len(selected)
             if all_remaining:
                 selected.extend(rng.sample(all_remaining, min(needed, len(all_remaining))))
+        elif len(selected) > limit:
+            # Gdy liczba unikalnych podkategorii przekracza limit, wylosuj dokładnie tyle, ile wynosi limit
+            selected = rng.sample(selected, limit)
 
     rng.shuffle(selected)
     return selected
@@ -221,6 +226,12 @@ def main():
         default=REPORTS_DIR,
         help="Katalog wyjściowy na raporty i wizualizacje",
     )
+    parser.add_argument(
+        "--seed",
+        type=int,
+        default=None,
+        help="Ziarno losowości (seed). Domyślnie None = każdorazowo w pełni losowe próbki. Podaj liczbę (np. 42), aby uzyskać powtarzalny zestaw.",
+    )
     args = parser.parse_args()
 
     # Wybór urządzenia
@@ -243,7 +254,7 @@ def main():
     logger.info("=" * 65)
 
     # 1. Pobranie próbek modowych
-    records = collect_fashion_records(args.metadata, limit=args.samples)
+    records = collect_fashion_records(args.metadata, limit=args.samples, seed=args.seed)
     if not records:
         logger.error("Nie znaleziono żadnych zdjęć z kategorii Moda w %s!", args.metadata)
         return

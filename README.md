@@ -142,16 +142,20 @@ python -m src.detection.benchmark_detection --device cuda --samples 100 --visual
 
 ### Krok 4: Skalowanie (RabbitMQ + GPU)
 
-Aby przetestować architekturę przygotowaną na wolumen produkcyjny:
+Architektura oparta o brokera wiadomości i workerów GPU pozwala na łatwe skalowanie horyzontalne przetwarzania setek tysięcy ofert w czasie rzeczywistym.
+
+
+**Wymagania wstępne:** Upewnij się, że aplikacja **Docker Desktop** jest uruchomiona (silnik Docker Engine musi mieć aktywny status). Do uruchomienia przetwarzania kolejkowego potrzebne będą **dwa osobne okna terminala** (jedno dla workera w pętli ciągłej, drugie dla producenta).
 
 #### 1. Uruchomienie brokera RabbitMQ (Docker Compose):
-```bash
+```powershell
 docker compose up -d
 ```
-Panel webowy zarządzania kolejkami: `http://localhost:15672` (login: `guest`, hasło: `guest`).
+Panel webowy zarządzania kolejkami dostępny jest pod adresem: `http://localhost:15672` (login: `guest`, hasło: `guest`).
 
-#### 2. Uruchomienie konsumenta / workera GPU:
-- **Dla klasyfikacji kategorii:**
+#### 2. Uruchomienie konsumenta / workera GPU (Terminal 1):
+Worker przechodzi w stan ciągłego nasłuchiwania i natychmiastowo przetwarza spływające paczki ofert (GPU batching):
+- **Dla klasyfikacji kategorii (SigLIP / CLIP):**
   ```powershell
   python -m src.queue.worker --model siglip --device cuda --batch-size 64
   ```
@@ -160,8 +164,9 @@ Panel webowy zarządzania kolejkami: `http://localhost:15672` (login: `guest`, h
   python -m src.queue.detection_worker --device cuda --batch-size 32
   ```
 
-#### 3. Zasilenie kolejki zadaniami (Producent):
-- **Wysyłanie wszystkich produktów do klasyfikacji:**
+#### 3. Zasilenie kolejki zadaniami (Terminal 2 - Producent):
+W nowym oknie konsoli uruchom producenta, który opublikuje zadania do kolejki:
+- **Wysyłanie produktów do klasyfikacji kategorii:**
   ```powershell
   python -m src.queue.producer --limit 500
   ```
@@ -239,7 +244,7 @@ ERLI-Rekrut/
 
 ## 6. Deklaracja Użycia Narzędzi AI
 - Narzędzia AI wykorzystano do:
-  - Generowania powtarzalnego kodu pomocniczego (modele Pydantic, obsługa argumentów CLI, konfiguracja pytest).
+  - Generowania powtarzalnego kodu pomocniczego (modele Pydantic, obsługa argumentów CLI, konfiguracja pytest, generowania mozaiki i temu podobne).
   - Wsparcia w doborze promptów semantycznych dla modeli Vision-Language.
   - Automatyzacji i optymalizacji zapytań I/O oraz konfiguracji środowiska CUDA 12.6.
-
+  - Pisania tej instrukcji, tak aby była dobrze zrozumiała 

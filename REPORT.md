@@ -275,3 +275,12 @@ Model w trybie *zero-shot* (open-vocabulary) miewa tendencję do mylenia zbliżo
    [ Baza Danych PostgreSQL ]    [ Baza Wektorowa ]
     (Wyniki, audit logi, JSONL)   (Embeddingi dla Visual Search)
 ```
+
+### Metadane i deklaracja użycia AI
+
+Metadane znajdują się w [metadata_copy.jsonl](metadata_copy.jsonl)
+Jak wspomniane również w README.md, AI wykorzystano do:
+- Generowania kodu
+- Wsparcia w doborze promptów semantycznych
+- Konfiguracji środowiska CUDA
+- pisania README i fragmentów tego raportu, oczywiście pod czujnym nadzorem :)
